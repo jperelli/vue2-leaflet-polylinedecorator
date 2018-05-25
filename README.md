@@ -29,9 +29,8 @@ something like this
 
     <v-map :zoom=10 :center="initialLocation">
       <v-tilelayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"></v-tilelayer>
-      <v-polyline-decorator :options="options">
-        <v-polyline :opacity="0" :latLngs="latlngs"></v-polyline>
-      </v-polyline-decorator>
+      <v-polyline-decorator :paths="[latlngsarray, otherlatlngsarray]" :options="options"></v-polyline-decorator>
+      <v-polyline :opacity="0" :latLngs="latlngsarray"></v-polyline>
     </v-map>
 
 ### on &lt;script&gt; add
@@ -65,9 +64,7 @@ At main Vue configuration, this will make the component available to all templat
 If you need to access other polylineDecorator methods, like [setPaths()](https://github.com/bbecquet/Leaflet.PolylineDecorator#methods), you can do it with a ref on the polylinedecorator vue element and using the `mapObject` property
 
     ...
-    <v-polyline-decorator ref="decoratorRef">
-      ...
-    </v-polyline-decorator>
+    <v-polyline-decorator ref="decoratorRef"></v-polyline-decorator>
     ...
 
     ...

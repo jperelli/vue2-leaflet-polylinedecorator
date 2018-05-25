@@ -1,9 +1,8 @@
 <template>
   <v-map :zoom=10 :center="initialLocation">
     <v-tilelayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"></v-tilelayer>
-    <v-polyline-decorator :options="options">
-      <v-polyline :opacity="0" :latLngs="latlngs"></v-polyline>
-    </v-polyline-decorator>
+    <v-polyline-decorator :paths="[latlngs]" :patterns="patterns"></v-polyline-decorator>
+    <v-polyline :opacity="0.5" :latLngs="latlngs"></v-polyline>
   </v-map>
 </template>
 
@@ -36,14 +35,23 @@
         x += rand();
         y += rand();
       }
-      let options = {
-        patterns: [
-             { offset: 12, repeat: 25, symbol: L.Symbol.dash({pixelSize: 10, pathOptions: {color: '#f00', weight: 2}}) },
-             { offset: 0, repeat: 25, symbol: L.Symbol.dash({pixelSize: 0}) }
-         ]
-      }
+      let patterns = [
+        { offset: 12, repeat: 25, symbol: L.Symbol.dash({pixelSize: 10, pathOptions: {color: '#f00', weight: 2}}) },
+        { offset: 0, repeat: 25, symbol: L.Symbol.dash({pixelSize: 0}) }
+      ]
+      setTimeout(function mutateLatLngs() {
+        latlngs.length = 0;
+        let x = -35.15;
+        let y = -58.2;
+        for (let i = 0; i < 10; i++) {
+          latlngs.push(L.latLng(x, y))
+          x += rand();
+          y += rand();
+        }
+        patterns.push({ offset: 6, repeat: 25, symbol: L.Symbol.dash({pixelSize: 5, pathOptions: {color: '#000', weight: 5}}) })
+      }, 3000);
       return {
-        options,
+        patterns,
         latlngs,
         initialLocation: L.latLng(x-0.3, y-0.3)
       }

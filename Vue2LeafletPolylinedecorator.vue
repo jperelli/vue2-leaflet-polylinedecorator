@@ -11,47 +11,54 @@ import 'leaflet-polylinedecorator'
 import { findRealParent, propsBinder } from 'vue2-leaflet'
 
 const props = {
-  options: {
-    type: Object,
-    default() { return {}; },
+  paths: {
+    type: Array,
+    default: () => []
   },
+  patterns: {
+    type: Array,
+    default: () => []
+  },
+  visible: {
+    type: Boolean,
+    custom: true,
+    default: true
+  }
 };
 
 export default {
+  name: 'LPolylineDecorator',
   props,
   data() {
     return {
       ready: false,
-    };
+    }
   },
   mounted() {
-    this.parentContainer = findRealParent(this.$parent);
-    this.mapObject = {pepe:1};
-    this.childrenLayers = [];
+    const polyline = L.polyline(this.paths);
+    const options = { patterns: this.patterns };
+    this.mapObject = L.polylineDecorator(polyline, options);
+    L.DomEvent.on(this.mapObject, this.$listeners);
+    propsBinder(this, this.mapObject, props);
     this.ready = true;
+    this.parentContainer = findRealParent(this.$parent);
+    this.parentContainer.addLayer(this, !this.visible);
   },
   beforeDestroy() {
     this.parentContainer.removeLayer(this);
   },
   methods: {
-    addLayer(layer, alreadyAdded) {
-      if (!alreadyAdded) {
-        this.parentContainer.addLayer(layer);
-        this.childrenLayers.push(layer.mapObject);
-        if (this.$children.length == this.childrenLayers.length) {
-          this.mapObject = L.polylineDecorator(this.childrenLayers, this.options);
-          L.DomEvent.on(this.mapObject, this.$listeners);
-          propsBinder(this, this.mapObject, props);
-          this.parentContainer.addLayer(this);
-          this.childrenLayers = [];
-        }
+    setVisible(newVal, oldVal) {
+      if (newVal == oldVal) return;
+      if (newVal) {
+        this.parentContainer.addLayer(this);
+      } else {
+        this.parentContainer.removeLayer(this);
       }
     },
-    removeLayer(layer, alreadyRemoved) {
-      if (!alreadyRemoved) {
-        this.mapObject.removeLayer(layer.mapObject);
-      }
-    },
-  },
+    addLatLng(value) {
+      this.mapObject.addLatLng(value);
+    }
+  }
 };
 </script>
